@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh">
+<!--
+这里是夏小正的鲜小海の小屋, Welcome!                                    
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="shortcut icon" href="/icon.png" type="image/png">
+    <title>提取ArtStation自带模型查看器中的模型数据 - 夏小正的鲜小海</title>
+    
+      
+<link rel="stylesheet" href="/css/style.css">
+
+      
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+      
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+      
+<link rel="stylesheet" href="/libs/zpix/zpix.css">
+
+      
+<script src="/js/theme.js"></script>
+
+    
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body id="bodyx" path="2019/11/02/提取ArtStation自带模型查看器中的模型数据/">
+    <div class="hd posts">
+    <a class="back" href="javascript:void(0);" target="_self"><i class="fa fa-reply replay-btn" aria-hidden="true"></i></a>
+    <h1 class="post-title">提取ArtStation自带模型查看器中的模型数据</h1>
+    <hr>
+
+    
+        <div class="outdated-notify">
+            本文发布于 <span class="num">-</span> 天前，文中所描述的信息可能已发生改变或是过时，请注意辨别
+        </div>
+    
+
+    <div class="post-content">
+        <p><img src="https://img.imjad.cn/images/2019/11/03/an_angel_flew_down_to_me.jpg" alt="3D Fanart Wataten: An Angel Flew Down to Me"></p>
+
+    <div class="cplayer-template"
+      id="cplayer-20567858"
+      data-id="cplayer-20567858"
+      data-playlist=%5B%7B%22name%22%3A%22loading...%22%2C%22artist%22%3A%22loading...%22%7D%5D
+      data-ids=[1356233927,1356237497,1356237499,1356233951,1356237498,1356237501,1356237500,1356233953,1356233949]
+      data-autoplay="false"
+      style="position: relative"
+    ></div>
+    <script>
+      (function(){
+
+        let getLyric = id => {
+          return new Promise((resolve, reject) => {
+            fetch("https://api.imjad.cn/cloudmusic/?type=lyric&id=" + id).then(res => {
+              return res.json()
+            }).then(data => {
+              // console.log(data)
+              if(!data.lrc){
+                data = Object.assign(data, {
+                  lrc: {lyric: '[00:00.00]找不到歌词的说…(⊙﹏⊙)[99:00.00]'},
+                  tlyric: {lyric: '[00:00.00]翻译不存在的说…╮(╯▽╰)╭[99:00.00]'}
+                })
+              }
+              let obj = {
+                lyric: data.lrc.lyric,
+                tlyric: data.tlyric.lyric
+              }
+              resolve(obj);
+            })
+          })
+        }
+
+        function loadcplayer() {
+          if (typeof window.cplayerList === 'undefined') window.cplayerList = {};
+          if (typeof window.cplayerList["cplayer-20567858"] !== 'undefined') return;
+          if (!cplayer.prototype.add163) cplayer.prototype.add163 = async function add163(id) {
+            if (!id) throw new Error("Unable Property.");
+            let lyric = await getLyric(id);
+            // console.log(lyric)
+
+            return fetch("https://api.imjad.cn/cloudmusic/?type=detail&id=" + id).then(function(res){return res.json()}).then(function(data){
+              let obj = {
+                name: data.songs[0].name,
+                artist: data.songs[0].ar.map(function(ar){ return ar.name }).join(','),
+                poster: data.songs[0].al.picUrl,
+                lyric: lyric.lyric,
+                sublyric: lyric.tlyric,
+                src: 'https://api.imjad.cn/cloudmusic/?type=song&raw=true&id=' + id
+              }
+              this.add(obj);
+              return obj;
+            }.bind(this))
+          }
+
+          window.cplayerList["cplayer-20567858"] = new cplayer({
+            element: document.getElementById("cplayer-20567858"),
+            playlist: [{"name":"loading...","artist":"loading..."}],
+            generateBeforeElement: false,
+            deleteElementAfterGenerate: false,
+            autoplay: false,
+            zoomOutKana: true,
+            style: `c-player {
+                      font-size: 16px !important;
+                      position: relative;
+                      left: 50%;
+                      transform: translateX(-50%);
+                      width: auto;
+                      max-width: 550px;
+                      margin: 30px auto;
+                    }
+                    c-player .cp-controls{
+                      user-select: none;
+                    }
+                    c-player .cp-lyric{
+                      width: 100%;
+                      margin: 0.41667em 0;
+                    }
+                    c-player .cp-play-button .cp-play-icon.cp-play-icon-paused {
+                      margin-left: 0.8em;
+                    }
+                    c-player .cp-drop-down-menu {
+                      line-height: 1.85;
+                    }
+                    @media (max-width: 768px) {
+                      c-player{
+                        font-size: 12px !important;
+                        left: auto;
+                        transform: none;
+                        width: 100%;
+                        margin: 10px auto;
+                      }
+                      c-player .cp-mainbody{
+                        min-height: 5.16667em;
+                      }
+                      c-player .cp-poster{
+                        width: 5.16667em;
+                        height: 5.16667em;
+                      }
+                      c-player .cp-center-container{
+                        height: 5.16667em;
+                      }
+                      c-player .cp-play-button, c-player .cp-volume-button, c-player .cp-prev-button, c-player .cp-list-button, c-player .cp-mode-button, c-player .cp-next-button{
+                        width: 1.54167em;
+                        height: 1.54167em;
+                      }
+                      c-player .cp-icon, c-player .cp-prev-icon, c-player .cp-next-icon, c-player .cp-volume-icon, c-player .cp-random-icon, c-player .cp-single-icon, c-player .cp-loop-icon, c-player .cp-list-icon{
+                        height: 1.54167em;
+                        width: 1.54167em;
+                      }
+                      c-player .cp-play-button{
+                        height: 2.8em;
+                        width: 2.8em;
+                      }
+                      c-player .cp-play-button .cp-play-icon{
+                        margin: 0.8em;
+                      }
+                      c-player .cp-play-button .cp-play-icon.cp-play-icon-paused {
+                        margin: 0.7875em;
+                        margin-left: 1em;
+                      }
+                      c-player .cp-volume-icon {
+                        width: 1.76667em;
+                      }
+                      c-player .cp-list-button {
+                        width: 1.54167em;
+                        height: 1.54167em;
+                      }
+                      c-player .cp-mode-button {
+                        width: 1.54167em;
+                        height: 1.54167em;
+                      }
+                    }
+                    `
+          });
+
+          window.cplayerList["cplayer-20567858"].add163(1356233927),window.cplayerList["cplayer-20567858"].add163(1356237497),window.cplayerList["cplayer-20567858"].add163(1356237499),window.cplayerList["cplayer-20567858"].add163(1356233951),window.cplayerList["cplayer-20567858"].add163(1356237498),window.cplayerList["cplayer-20567858"].add163(1356237501),window.cplayerList["cplayer-20567858"].add163(1356237500),window.cplayerList["cplayer-20567858"].add163(1356233953),window.cplayerList["cplayer-20567858"].add163(1356233949)
+
+          let player = window.cplayerList["cplayer-20567858"]
+          player.to(1)
+          player.remove(player.playlist[0])
+        }
+        
+        if (typeof window.cplayer === 'undefined' && !document.getElementById("cplayer-script")) {
+          var js = document.createElement("script");
+          js.src = 'https://cdn.jsdelivr.net/gh/MoePlayer/cPlayer/dist/cplayer.js';
+          js.id = "cplayer-script";
+          js.addEventListener("load", loadcplayer);
+          document.body.appendChild(js);
+        } else {
+          window.addEventListener("load", loadcplayer);
+        }
+      })()
+    </script>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>需要说明的是，折腾仅限用于学习用途，可通过正规途径购买的模型请勿非法提取，请勿对模型、贴图及动画等数据进行修改、二次分发、用于商用等违反<a target="_blank" rel="noopener" href="https://www.artstation.com/tos">ArtStation服务条款</a>及著作权相关法律法规的行为。使用本文提到的方法提取模型产生的一切后果由操作人承担，与本网站及本人无关</p>
+</blockquote>
+<p>没想到时隔大半年的首次更新还是因为萝莉🤪，翻看评论列表时看到<a target="_blank" rel="noopener" href="https://imjad.cn/archives/lab/ripping-sketchfab-models">此前介绍Sketchfab模型提取的文章</a>的评论中有人提到<del>而我因为太懒并没有回复他😪</del>智乃模型的作者Xkung目前转到ArtStation发布作品，并且已经发布了<a target="_blank" rel="noopener" href="https://www.artstation.com/artwork/3oLez2">新作</a>—— 动画「<span style="color:#E12351">天<span style="color:#A35E95;">使</span><span style="color:#6BAE23;">降</span><span style="color:#00B9FA;">临</span><span style="color:#FC951C;">到了</span>我<span style="color:#FC951C;">身边</span>！</span>」中的五位小学生。于是乎又一次「顿时感觉想要拥有」，同样的，模型作者并没有开放下载和购买，那么魔高一丈，就来找ArtStation的提取方法吧</p>
+<h2 id="提取"><a href="#提取" class="headerlink" title="提取"></a>提取</h2><p>打开ArtStation的作品页面，观察查看模型前后浏览器开发者工具的资源请求，很明显，有一个<code>.mview</code>结尾的请求，看文件大小是包含模型的数据了，并且就加载完成后贴图文件也瞬间以Object URL的形式加载完毕，说明贴图文件也包含在此mview文件中。在新标签页打开会跳转下载</p>
+<p><img src="https://img.imjad.cn/images/2019/11/03/Snipaste_2019-11-03_03-05-42.png" alt="network log"></p>
+<p>用十六进制编辑器打开mview文件，发现文件内容未经过加密，似乎是直接将各个部件的二进制数据拼接起来的，而我的半吊子水平分析到这一步也基本到头了，下一步的解析需要借助前人的智慧</p>
+<blockquote>
+<p>「99%的问题都已经被前人遇到并解决了，而你只需要谷歌」　　　　——『飞鸟集』</p>
+</blockquote>
+<p>让我们来搜索解析工具，好的，搜到了：<a target="_blank" rel="noopener" href="https://github.com/majimboo/mviewer">majimboo/mviewer</a>，根据介绍，这个脚本能将mview文件中包含的dat模型文件、贴图及json描述文件提取出来，并转换为obj格式的模型</p>
+<p>执行命令，成功拆解出贴图和一堆obj部件，注意此步骤得到的贴图文件名是正确的原始名</p>
+<pre><code class="bash"># mview文件解包
+python extract_mview.py &lt;filename&gt;
+
+# dat转换为obj模型
+python extract_model.py &lt;folder_containing_scene.json&gt;</code></pre>
+<p><img src="https://img.imjad.cn/images/2019/11/03/Snipaste_2019-11-03_03-52-56.png" alt="extract mview"></p>
+<p>作者同样提供了一个附带了mview解析插件的<a target="_blank" rel="noopener" href="http://richwhitehouse.com/index.php?content=inc_projects.php">Noesis</a>，可视化操作更加方便，并且可以导出模型整体为多种常用格式</p>
+<p><img src="https://img.imjad.cn/images/2019/11/03/Snipaste_2019-11-03_03-59-59.png" alt="Noesis"></p>
+<p>直接将mview文件拖入Noesis，稍后将解析成功，右侧预览窗口能看到模型预览。然后依次点击File - Export进行导出操作，导出格式选择obj或fbx，其余保持默认，一段时间后将导出完成，包含模型本体与一堆被重命名的贴图文件</p>
+<h2 id="修正贴图轴向"><a href="#修正贴图轴向" class="headerlink" title="修正贴图轴向"></a>修正贴图轴向</h2><p>将导出后的模型文件拖入3dmax，发现模型内贴图名为原始文件名，新建<code>textures</code>目录，将手动执行脚本得到的原始贴图放入，发现3dmax已经能识别到贴图，但uv方向似乎有些问题，调整u方向为180度，即y轴翻转后显示正常</p>
+<p><img src="https://img.imjad.cn/images/2019/11/03/Snipaste_2019-11-03_02-15-45.png" alt="调整方向"></p>
+<p><img src="https://img.imjad.cn/images/2019/11/03/Snipaste_2019-11-02_03-33-04.png" alt="不然就会这样"></p>
+<p>但挨个调整还是过于麻烦，搜索一番后，找到了批量调整贴图的工具：<a target="_blank" rel="noopener" href="https://tieba.baidu.com/p/4696461174">GD Ripper</a>，看介绍是一套用于手游3D模型提取的工具集，有机会可以研究研究。这里用到的是「高级工具-贴图工厂-图片旋转翻转」的功能，根据打印出的日志来看，实质是调用的<a target="_blank" rel="noopener" href="https://newsgroup.xnview.com/viewforum.php?f=57">NConvert</a>进行的转换</p>
+<p><img src="https://img.imjad.cn/images/2019/11/03/Snipaste_2019-11-03_04-20-55.png" alt="翻转y轴"></p>
+<p>完成之后再次导入至3dmax，显示已经正常，至此整个提取导入的操作全部完成</p>
+<h2 id="移除不必要的高光与描边"><a href="#移除不必要的高光与描边" class="headerlink" title="移除不必要的高光与描边"></a>移除不必要的高光与描边</h2><p>在左侧对象列表中选中所有包含<strong>line</strong>与<strong>hilight</strong>字样的对象，直接删除即可，可使用高级过滤器快速筛选</p>
+<p><img src="https://img.imjad.cn/images/2019/11/03/Snipaste_2019-11-03_02-04-35.png" alt="Fillter"></p>
+<h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><p><a target="_blank" rel="noopener" href="https://www.artstation.com/artwork/3oLez2">ArtStation - 3D Fanart Wataten : An Angel Flew Down to Me, Xkung Work</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/majimboo/mviewer">majimboo/mviewer: Reverse Engineer MView 3D File Format</a></p>
+<p><a target="_blank" rel="noopener" href="https://tieba.baidu.com/p/4696461174">手游3D模型提取工具《GD Ripper V2》【gdstudio吧】_百度贴吧</a></p>
+
+    </div>
+
+    
+        <hr class="fhr">
+        <div id="vcomments"></div>
+    
+
+	<script>
+        var pub_date = 1572699120000;
+    </script>
+</div>
+    <div class="footer"
+     id="footer">
+    <p>
+        Copyright © 2020 <a class="flink"
+           href="https://zqchen.me">夏小正的鲜小海</a> · Theme by <a class="flink"
+           target="_blank" rel="noopener" href="https://github.com/zhuoqun-chen/hexo-theme-geek">Geek</a>.
+        <br>
+        Made with <i class="fa fa-heart throb"
+           style="color:#d43f57"></i> by <span class="author"
+              itemprop="copyrightHolder">zhuoqun-chen</span>
+        <label class="el-switch el-switch-green el-switch-sm"
+               style="vertical-align: sub;">
+            <input type="checkbox"
+                   name="switch"
+                   id="update_style">
+            <span class="el-switch-style"></span>
+        </label>
+    </p>
+</div>
+
+<a href="javascript:void(0);" class="back-to-top" target="_self"></a>
+
+<input type="hidden"
+       id="web_style"
+       value="white">
+<input type="hidden"
+       id="valine_appid"
+       value="fB9hqbiyAbuyAH2YJpybBIPz-gzGzoHsz">
+<input type="hidden"
+       id="valine_appKey"
+       value="28HDb9xLrH5B8g5MhkEU8Cwa">
+<script src='//cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js'></script>
+
+  
+<script src="/libs/jquery.min.js"></script>
+
+  
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+  
+<script src="/js/js.js"></script>
+
+
+<style type="text/css">
+    .v * {
+        /* color: #698fca; */
+    }
+
+    .v .vlist .vcard .vhead .vsys {
+        color: #3a3e4a;
+    }
+
+    .v .vlist .vcard .vh .vmeta .vat {
+        color: #638fd5;
+    }
+
+    .v .vlist .vcard .vhead .vnick {
+        color: #6ba1ff;
+    }
+
+    .v a {
+        color: #8696b1;
+    }
+
+    .v .vlist .vcard .vhead .vnick:hover {
+        color: #669bfc;
+    }
+
+    .v .vcards .vcard .vhead .vnick {
+        padding-left: 1px;
+    }
+
+    .v .vcontent .vemoji {
+        max-width: 30px;
+    }
+
+    .v[data-class=v] p {
+        color: inherit;
+    }
+
+</style>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-6DBJ1VN2JX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-6DBJ1VN2JX');
+</script> -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+
+</body>
+
+</html>
